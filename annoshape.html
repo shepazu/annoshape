@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Annoshape</title>
+	
+	<style type="text/css" media="screen">
+	 body {
+	   margin: 2em 4em 2em 4em;
+	 }
+	 
+	 pre code {
+	   padding-left: 1em;
+	 }
+	 
+	 img {
+	   outline: thin gray solid;
+	 }
+	 
+	 img:nth-of-type(2n) {
+	   outline: 5px blue solid;
+	 }
+	 
+	 span.hilite {
+	   color: red;
+	 } 
+	 
+	 span.lolite {
+	   color: gray;
+	 } 
+	</style>
+</head>
+<body onload="init()">
+  <section id="intro">
+    <h1>Annoshape</h1>
+    <p>Annoshape is a URL-based format that allows you to draw shapes on top of images, maps, and videos on any page via a URL parameter. It's suitable for use with annotation formats, or as a standalone utility. Currently, Annoshape is not a standard, just a small script library, though it may be considered as part of a standard at some point in the future; it may be currently be described as a non-standard profile of SVG.</p>
+    <p>Annoshape is the SVG equivalent of <a href="https://en.wikipedia.org/wiki/Well-known_text">Well-known text (WKT)</a>, simplified for only geometric elements, and serialized to be usable as a URL parameter.</p>
+    <p>Note that that scope of this proposal is limited to providing a link into a view of a visual resource (like an image or map), and provide highlights within that view. It is intended to be complementary to other technologies, not a replacement.</p>
+  </section>
+
+  <section id="demo">
+    <h2>Demo</h2>
+    <p>Details about syntax, usage, and more are below, but first, it is helpful to see set the stage with a demonstration. To see Annoshape in action, click on the links below each example, which showcase the features of Annoshape. Each link will highlight different parts of the images.</p>
+    
+    <p>In addition, once an image already has a highlight on it, you can click to make a shape or a line. Each click will add another point to the line, and clicking on the initial point will complete the shape; a link to the new Annoshape highlight will appear in the list below, as both a polyline or a polygon. Making new shapes is not part of the Annoshape proposal itself, but just a demonstration to show how easy it is to make a simple Annoshape highlight URL.</p>
+      
+    <section id="image-demo">
+      <h3>Image Demo</h3>
+      <p>This demo shows the basic highlighting and linking capabilities of Annoshape on a static image.</p>
+      <img id="wedding" src="wedding.jpg" width="400" height="600">
+      <ul>
+        <li><b>Default, with no overlaid graphics:</b> 
+          <a href="annoshape.html#wedding">annoshape.html#wedding</a>
+        </li>
+        <li><b>Path outline of a hat:</b> 
+          <a  href="annoshape.html#svg(target-selector:%23wedding){path(fill:purple;stroke-width:1px;){M123,133Q116,105,136,98L137,80C150,55,195,75,189,88L184,104Q207,115,179,137Q189,103,149,107S125,111,123,133}}">#svg(target-selector:%23wedding){path(fill:purple;stroke-width:1px;){M123,133Q116,105,136,98L137,80C150,55,195,75,189,88L184,104Q207,115,179,137Q189,103,149,107S125,111,123,133}}</a>
+        </li>
+        <li><b>Ellipse outline of a head:</b> 
+          <a  href="annoshape.html#svg(target-selector:%23wedding){ellipse(stroke:gold;stroke-width:5px;){cx:236;cy:141;rx:32;ry:38;}}">#svg(target-selector:%23wedding){ellipse(stroke:gold;stroke-width:5px;){cx:236;cy:141;rx:32;ry:38;}}</a>
+        </li> 
+        <li><b>Image targeting via hash fragment:</b> 
+          <a href="annoshape.html?svg{circle(fill:red;){cx:67;cy:82;r:18}}#wedding">?svg{circle(fill:red;){cx:67;cy:82;r:18}}#wedding</a>
+        </li>
+        <li><b>Automatic image targeting (first image on page):</b> 
+          <a href="annoshape.html#svg{circle(fill:yellow;){cx:67;cy:82;r:18}}">#svg{circle(fill:yellow;){cx:67;cy:82;r:18}}</a>
+        </li>
+        <li><b>Single URL with overlays targeting each image individually (a green dot should appear in the top left corner of both the photo and the map image):</b> 
+          <a href="annoshape.html#svg(target-selector:%23wedding){circle(fill:lime;){cx:20;cy:20;r:18}}&svg(target-selector:%23map){circle(fill:lime;){cx:20;cy:20;r:18}}">#svg(target-selector:%23wedding){circle(fill:lime;){cx:20;cy:20;r:18}}&svg(target-selector:%23map){circle(fill:lime;){cx:20;cy:20;r:18}}</a>
+        </li>
+      </ul>
+      
+    </section>
+      
+    <section id="map-demo">
+      <h3>Map Demo</h3>
+      <p>This demo is simply an image of a map, not a true mapping service. It only demonstrates the highlighting and linking  capabilities of Annoshape, not the correspondence between the SVG overlay and an interactive tiled map. However, this specification does address how a mapping service could support fetching and rendering the appropriate area for a client-side SVG overlay.</p>
+      <img id="map" src="StreetMap-CH.png" width="830" height="582">
+      <p>Examples:</p>
+      <ul>
+        <li><b>Default, with no overlaid graphics:</b> 
+          <a href="annoshape.html#map">annoshape.html#map</a>
+        </li>
+        <li><b>Polygon outline of a building, with default styling:</b> 
+          <a  href="annoshape.html#svg(target-selector:%23map){polygon{351,319,355,317,357,320,361,318,360,314.5,365,312,371,323.5,366,326,363.5,322.5,359.5,324.5,361,328,357,330}}">#svg(target-selector:%23map){polygon{351,319,355,317,357,320,361,318,360,314.5,365,312,371,323.5,366,326,363.5,322.5,359.5,324.5,361,328,357,330}}</a>
+        </li>
+        <li><b>Polygon outline of a building and circular outline of another building, with default styling:</b> 
+          <a href="annoshape.html#svg(target-selector:%23map){polygon{351,319,355,317,357,320,361,318,360,314.5,365,312,371,323.5,366,326,363.5,322.5,359.5,324.5,361,328,357,330}circle{cx:368;cy:181;r:18}}">#svg(target-selector:%23map){polygon{351,319,355,317,357,320,361,318,360,314.5,365,312,371,323.5,366,326,363.5,322.5,359.5,324.5,361,328,357,330}circle{cx:368;cy:181;r:18}}</a>
+        </li>
+        <li><b>Polyline route path, with a red, dashed stroke:</b> 
+          <a href="annoshape.html#svg(target-selector:%23map){polyline(stroke:red;stroke-dasharray:5,5;stroke-linecap:round;){300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}}">#svg(target-selector:%23map){polyline(stroke:red;stroke-dasharray:6,3;stroke-linecap:round;){300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}}</a>
+        </li>
+        <li><b>Brightly-colored polygon outline of a building, with a solid fill color:</b> 
+          <a href="annoshape.html#svg(target-selector:%23map){polygon(stroke:gold;stroke-width:4px;fill:cornflowerblue;){351,319,355,317,357,320,361,318,360,314.5,365,312,371,323.5,366,326,363.5,322.5,359.5,324.5,361,328,357,330}}">#svg(target-selector:%23map){polygon(stroke:gold;stroke-width:4px;fill:cornflowerblue;){351,319,355,317,357,320,361,318,360,314.5,365,312,371,323.5,366,326,363.5,322.5,359.5,324.5,361,328,357,330}}</a>
+        </li>
+        <li><b>Rectangle outlining an area of interest that has no representation on the map, with default styling:</b> 
+          <a href="annoshape.html#svg(target-selector:%23map){rect{x:325;y:230;width:42;height:23}}">#svg(target-selector:%23map){rect{x:260;y:235;width:42;height:23}}</a>
+        </li>
+        <li><b>Polyline with arrow marker at the end, with default styling:</b> 
+          <a href="annoshape.html#svg(target-selector:%23map){polyline(marker-end:url(%23annoshape-arrow);){300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}}">#svg(target-selector:%23map){polyline(marker-end:url(%23annoshape-arrow);){300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}}</a>
+        </li>
+        <li><b>Thick red polyline with arrow marker at the end:</b> 
+          <a href="annoshape.html#svg(target-selector:%23map){polyline(marker-end:url(%23annoshape-arrow);stroke-width:5px;stroke:red;){300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}}">#svg(target-selector:%23map){polyline(marker-end:url(%23annoshape-arrow);stroke-width:5px;stroke:red;){300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}}</a>
+        </li>
+        <li><b>Polyline with dot and map-point markers:</b> 
+          <a href="annoshape.html#svg(target-selector:%23map){polyline(marker-start:url(%23annoshape-dot);marker-end:url(%23annoshape-mappin);stroke-width:5px;stroke:blue;){300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}}">#svg(target-selector:%23map){polyline(marker-start:url(%23annoshape-dot);marker-end:url(%23annoshape-mappin);stroke-width:5px;stroke:blue;){300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}}</a>
+        </li>
+        <li><b>Building shape with curved lines:</b> 
+          <a href="annoshape.html#svg(target-selector:%23map){path(stroke:gold;stroke-width:2px;){M404,396.5L409,399L413,393L419,396L426,393L428,388Q454,382,474,409L464,421Q447,405,428,403L419,421Q433,435,455,437L453.5,451Q416,449,407,424L407,418.5L402.5,416L405,410L399,406.5Z}}">#svg(target-selector:%23map){path(stroke:gold;stroke-width:2px;){M404,396.5L409,399L413,393L419,396L426,393L428,388Q454,382,474,409L464,421Q447,405,428,403L419,421Q433,435,455,437 L453.5,451Q416,449,407,424L407,418.5L402.5,416L405,410L399,406.5Z}}</a>
+        </li>
+        <li><b>Route path with curved lines and markers:</b> 
+          <a href="annoshape.html#svg(target-selector:%23map){path(stroke:lime;marker-start:url(%23annoshape-dot);marker-end:url(%23annoshape-mappin);){M408,479C435,485,425,498,420,512C411,529,413,536,414,556C442,554,453,543,482,533C504,522,530,527,540,532C544,508,540,502,531,496C507,483,499,451,538,437C562,426,567,432,601,423C621,412,617,393,618,378C617,357,619,344,621,329C621,304,625,305,628,299C643,312,661,323,675,326C675,332,676,339,674,350C672,362,673,375,677,387C681,398,680,411,665,411C655,410,650,414,652,423C655,432,665,438,674,442C683,449,687,455,687,468C687,478,693,485,698,495C706,506,703,508,721,515C738,519,743,520,749,527C751,530,754,540,766,535C776,526,776,535,787,529C793,524,791,521,791,498C792,489,789,485,781,483,483}}">#svg(target-selector:%23map){stroke:lime;marker-start:url(%23annoshape-dot);marker-end:url(%23annoshape-mappin);){M408,479C435,485,425,498,420,512C411,529,413,536,414,556C442,554,453,543,482,533C504,522,530,527,540,532C544,508,540,502,531,496 C507,483,499,451,538,437C562,426,567,432,601,423C621,412,617,393,618,378C617,357,619,344,621,329C621,304,625,305,628,299 C643,312,661,323,675,326C675,332,676,339,674,350C672,362,673,375,677,387C681,398,680,411,665,411C655,410,650,414,652,423 C655,432,665,438,674,442C683,449,687,455,687,468C687,478,693,485,698,495C706,506,703,508,721,515C738,519,743,520,749,527 C751,530,754,540,766,535C776,526,776,535,787,529C793,524,791,521,791,498C792,489,789,485,781,483,483}}</a>
+        </li>         
+        <li><b>Reference to geographic properties for web maps (note that this uses a query string rather than a fragment, since it's requesting a specific view of the resource from the server):</b> 
+          <a href="annoshape.html?svg(target-selector:%23map;width:830;height:582;viewbox:0,0,830,582;gis-x-min:1981140.803;gis-x-max:1989960.339;gis-y-min:783308.997;gis-y-max:789490.642;gis-crs:EPSG-2264;){circle{cx:368;cy:181;r:18}}#map">?svg(width:830;height:582;viewbox:0,0,830,582;gis-x-min:1981140.803;gis-x-max:1989960.339;gis-y-min:783308.997;gis-y-max:789490.642;gis-crs:EPSG-2264;){circle{cx:368;cy:181;r:18}}#map</a>
+        </li>
+      </ul>
+    </section>
+  </section>
+
+  <section id="syntax">
+    <h2>Syntax</h2>
+    <p><b>Note:</b> This is experimental syntax, and it's subject to change if anyone has a better idea. In particular, having the root element be named something other than <code>svg</code> might be a good idea.</p>
+
+    <p>Annoshape is intended for use as a URL parameter, so it uses a different syntax than SVG markup; the syntax is inspired by CSS and WKT. However, all the essential aspects of the language (e.g., element names, attribute names and values, property names and values) remain the same.</p>
+
+    <p>Permitted SVG elements in Annoshape are <code>line</code>, <code>rect</code>, <code>circle</code>, <code>ellipse</code>, <code>polyline</code>, <code>polygon</code>, and <code>path</code>. (In SVG 2, this list may include the <code>point</code> element and the <code>star</code> element.) Currently, a point can be represented by a <code>circle</code> element, with a radius of 0 or more (which may be used to represent a measure of precision, accuracy, or scope).</p>
+
+    <p>Each element is simply the name of the element as a string (e.g., <code>polyline</code>), followed by an optional set of CSS properties contained in parentheses (e.g., <code>(stroke:red;)</code>), followed by the geometry attributes contained in curly brackets with comma-separated values (e.g., <code>{300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}</code>).</p>
+    <p>For example:</p>
+    <pre><code>polyline(stroke:red;){300,131.5,207,174.5,261,290.5,411,220.5,432,265.5,417,272.5}</code></pre>
+
+    <p>For elements with multiple geometry attributes, such as <code>line</code>, <code>rect</code>, <code>circle</code>, and <code>ellipse</code>, the attributes are separated by a semicolon, with attribute names and values separated by a colon; for example</p>
+    <pre><code>circle{cx:368;cy:181;r:18}</code></pre>
+    <p>As with element names, these attribute names are identical to their use in normal SVG markup.</p>
+    <p>For elements with a single geometry attribute, such as <code>polyline</code>, <code>polygon</code>, and <code>path</code>, the attribute name and/or trailing colon can optionally be omitted; for example, all of these are valid and identical:</p>
+    <pre><code>polygon{<span class="hilite">points:</span>351,319,355,317,357,320,361,318,360,314.5,365,312,371,323.5,366,326,363.5,322.5,359.5,324.5,361,328,357,330<span class="hilite">;</span>}</code></pre>
+    <pre><code>polygon{<span class="hilite">points:</span>351,319,355,317,357,320,361,318,360,314.5,365,312,371,323.5,366,326,363.5,322.5,359.5,324.5,361,328,357,330}</code></pre>
+    <pre><code>polygon{351,319,355,317,357,320,361,318,360,314.5,365,312,371,323.5,366,326,363.5,322.5,359.5,324.5,361,328,357,330}</code></pre>
+
+    <p>All numerical geometric values must be unitless (which may be thought of as pixels, but which is actually relative portions of the declared SVG viewbox). Percentages must not be used, and are not needed; the geometry is meant to indicate a fixed area, not a percentage of the viewport, and the SVG viewbox scales the overlay to meet the appropriate size and dimensions of the target image.</p>
+    
+    <p>As with normal SVG, all elements that apply to a specific image are contained by the SVG root; in the case of Annoshape, this follows the same convention of the name of the element as a string (i.e., <code>svg</code>), followed by an optional set of CSS properties contained in parentheses (e.g., <code>(stroke:red;)</code>). There is no space or other delimiter between the end of one element declaration and the start of another. The whole string is treated as a single URL parameter.</p>
+    <p>For example:</p>
+    <pre><code><span class="hilite">svg(){<span class="lolite">circle{cx:368;cy:181;r:18}rect{x:10;y:15;width:42;height:23}</span>}</span></code></pre>
+    <p>Each Annoshape string is treated as a single URL parameter, and the initial Annoshape string should be prefixed with the query delimiter <code>?</code> or the hash delimiter <code>#</code>. Each Annoshape declaration can target a specific image or video resource via Annoshape-specific <code>target-selector</code> property, and multiple image resources on the same page can be targeted by having multiple Annoshape declarations delimited by the ampersand <code>&</code>. The value of the <code>target-selector</code> property must be a valid selector string as described in the <a href="http://www.w3.org/TR/selectors-api/">Selectors API</a> specification (e.g. it may be an <code>id</code>, a classname, an element name, etc.); note that the selector string must be properly URL-encoded (e.g., for an <code>id</code>, the <code>#</code> should be percent-encoded as <code>%23</code>). For example:</p>
+    <pre><code><span class="hilite">?</span><span class="lolite">svg(target-selector:%23map;){circle{cx:368;cy:181;r:18}}<span class="hilite">&</span><span class="lolite">svg(target-selector:%23house;){rect{x:10;y:15;width:42;height:23}}</span></code></pre>
+
+    <p>Although multiple elements are allowed within a single Annoshape declaration, only one Annoshape declaration must be applied to a single target resource; if more than one Annoshape declaration in a single URL targets the same resource, the final Annoshape declaration must replace all previous Annoshape declarations for that same resource. Note that the same image may be loaded onto a page with multiple <code>img</code> elements; these must be considered separate resources. (The single-declaration restriction may be lifted for timed media where the Annoshape root contains a specific time range; in this case, only one Annoshape declaration <i>per time range</i> may be applied.) (<b>Note:</b> This is how it's currently implemented, but maybe it's a bad idea...? Maybe if an additional declaration is made, all of the declaration can apply. That might not be the end of the world, though it would mean that multiple SVGs would stack and that might hurt performance.)</p>
+    
+    <p>If a URL of a loaded page is changed to remove any Annoshape declaration, that Annoshape instances on all target resources on that page must be removed.</p>
+
+    <h3 id="frag-v-query">URL Fragments versus URL Queries</h3>
+    
+    <p>An Annoshape declaration can be used as either a URL fragment (or “hash”), or as a URL query, depending on the content type that it's targeting. There is no syntactic difference between an Annoshape fragment or query, other than the initial delimiter.</p>
+    <p>A <b>fragment</b> should be used if the target resource is loaded with no extra information needed, such as a static image. An Annoshape fragment must be declared after the end of any query string, and must begin with a hash symbol (<code>#</code>), like so:</p>
+    <pre><code><span class="lolite"><span class="hilite">#</span>svg(target-selector:%23house;){rect{x:10;y:15;width:42;height:23}}</span></code></pre>
+    
+    <p>Unlike typical fragment strings, which consist solely of the <code>id</code> of the target element, an Annoshape fragment declaration can include multiple targets; an Annoshape fragment string must begin with a hash symbol (<code>#</code>), and must be composed of one or more Annoshape declarations separated by an ampersand (<code>&amp;</code>), like so:</p>
+    
+    <pre><code><span class="hilite">#</span><span class="lolite">svg(target-selector:%23image1;){circle{cx:368;cy:181;r:18}}
+       <span class="hilite">&amp;</span><span class="lolite">svg(target-selector:%23image2;){rect{x:10;y:15;width:42;height:23}}</span></code></pre>
+       
+    <p>Because a URL can have only one fragment string, a URL with an Annoshape fragment string cannot also have a fragment identifier to scroll the target element into view, which would be inconvenient; therefore, the target element of the first Annoshape declaration in fragment string must be scrolled into view.</p>
+    
+    <p>A <b>query string</b> should be used if the target resource needs extra information to be properly delivered by the server, such as a particular tile, section, or projection of a map, or a specific time range for a streamed video. Note that it is a common convention for a query string to be comprised of both a name and a value (known as a “name-value pair”), or often several name-value pairs separated by an ampersand (<code>&amp;</code>), but this is not mandatory syntax, and Annoshape does not follow this convention; instead, an Annoshape query string must begin with a question mark (<code>?</code>), must be composed of one or more Annoshape declarations separated by an ampersand (<code>&amp;</code>), like so:</p> 
+    <pre><code><span class="hilite">?</span><span class="lolite">svg(target-selector:%23map1;){circle{cx:368;cy:181;r:18}}
+      <span class="hilite">&</span><span class="lolite">svg(target-selector:%23map2;){rect{x:10;y:15;width:42;height:23}}</span></code></pre>
+    
+    <p>Both a query string and a fragment can be used, such as when multiple resources are being targeted, as below:</p>
+    <pre><code><span class="lolite">http://example.com/for-sale.html
+      <span class="hilite">?</span>svg(target-selector:%23map;){circle{cx:368;cy:181;r:18}}
+      <span class="hilite">#</span>svg(target-selector:%23house;){rect{x:10;y:15;width:42;height:23}}</span></code></pre>
+    
+    <p>Note that only the single-declaration restriction also applies to Annoshape declarations that target the same resource via a query string and a fragment string in the same URL.</p>
+    
+    <h3 id="style">Default Styles</h3>
+    
+    <p>The default style for all shapes in Annoshape is different than regular SVG. The style defaults are <code>fill:none</code>, <code>stroke:black</code>, and <code>stroke-width:3px</code>. All of these style can be overridden, and additional styles can be applied; some style properties are particularly useful for delineating overlay shapes, such as <code>opacity</code>, <code>stroke-linecap</code>, <code>stroke-linejoin</code>, and <code>stroke-dasharray</code>. Markers are also useful, but more complicated.</p>
+    
+    <h2 id="geo-info-extensions">Geographic Information Extensions</h2>
+    
+    <p>For use with mapping, rather than simple images, several more pieces of information are needed in order to establish the proper context for the shapes within the coordinate system of their root SVG canvas. For example, a link to a map webapp needs to indicate to the map which zoom and pan states are needed to properly apply the Annoshape overlay. In addition, because the map is in its own Coordinate Reference System (CRS), with its own horizontal and vertical bounds (expressed as X-min, X-max, Y-min, and Y-max), and possibly with its own projection, all these details need to be supplied in order to properly overlay the SVG shapes, lines, and points to express the original intent.</p>
+    <p>In the disciplines of Geographic Information Systems (GIS) and geodesy, a Coordinate Reference System (CRS) –also known as a Spatial Reference System (SRS)– is a codified framework to specify any given location on Earth by a set of three numbers (coordinates) describing the latitude, the longitude, and optionally the altitude; each CRS defines this framework in a different way, with different reference points. There are two types of CRS: Geographic Coordinate Systems (GCS); and projected coordinate systems. One of the most common GCSes is WGS84 (World Geodetic System 1984), which is a coordinate system that defines an angular unit of measure, a prime meridian, and a datum; the datum defines an ellipsoid that describes the idealized shape of the Earth and the relationship of the ellipsoid to the Earth itself; together, all of these components allow us to describe a global location with functional precision. Even with this information, however, features of a map may look distorted because the surface of the Earth is a spheroid, not a plane; thus, a view of a map also includes a “projection”, or a systematic transformation of the raw latitude and longitude coordinates onto an appropriate mathematical surface, is used. No map projection is “true” –each is a distortion of the coordinate data– but different projections are good for different tasks, such as measuring distance, area, shape, direction or bearing, scale, and so on, and the selection of a projection may depend on its suitability for different scales, whether the area has a larger east-west extent or north-south extent, or the latitude and longitude of the region.</p>
+    <p>Each projection explicitly operates within the context of a CRS, and the concept of a CRS incorporates both the Geographic Coordinate System (like WSG84 or NAD83) and the projection (like EPSG-2264). Each CRS has a unique code with the EPSG registry (maintained by OGP, the International Association of Oil and Gas Producers), which describes its applicable region, units of measure, underlying CRS for projections, reference latitude and longitude, and many other parameters that allow for its transformation into another CRS.</p>
+    <p>No single map, projection, or GCS is best for all purposes, and many different systems are in place around the world, each with many different datasets that use that CRS. Thus, a robust system for mapping should include the ability to adapt to any of these geodetic localizations, and to use the data that is available. To that end, Annoshape does not define a single canonical CRS, but relies on its own geometric (not geographic) coordinate system and established dimensions and viewbox, and provides a set of properties that allow that coordinate system to be transformed into the CRS that was used to create the original overlay graphics (and from there, potentially transformed into any other desired CRS).</p>
+    <p>Annoshape does this by defining 5 GIS-specific properties: <code class="property">gis-x-min</code>, <code class="property">gis-x-max</code>, <code class="property">gis-y-min</code>, <code class="property">gis-y-max</code>, and <code class="property">gis-crs</code>. These properties, while not formal CSS properties, are nevertheless included in the list of parameters in the SVG root, along with its CSS properties, like so:</p>
+    <pre><code>
+    <span class="hilite">svg(width:830;height:582;viewbox:0,0,830,582;
+        gis-x-min:1981140.803;gis-x-max:1989960.339;gis-y-min:783308.997;gis-y-max:789490.642;gis-crs:EPSG-2264;)
+        {<span class="lolite">circle{cx:368;cy:181;r:18}</span>}</span>
+		</code></pre>
+    <p>Unlike CSS properties, these properties are not intended to change the appearance of the SVG in the browser, but rather to inform the underlying mapping system which parameters should be used when fetching the desired map. This is intended as a universal system for marking up web maps (as well as other images).</p>
+
+    <h3 id="gis-x-min"><code class="property">gis-x-min</code></h3>
+    <p>The eastern (left) boundary of the described area, in the default units of the GCS, expressed in decimal degrees where applicable.</p>
+      
+    <h3 id="gis-x-max"><code class="property">gis-x-max</code></h3>
+    <p>The western (right) boundary of the described area, in the default units of the GCS, expressed in decimal degrees where applicable.</p>
+
+    <h3 id="gis-y-min"><code class="property">gis-y-min</code></h3>
+    <p>The northern (top) boundary of the described area, in the default units of the GCS, expressed in decimal degrees where applicable.</p>
+
+    <h3 id="gis-y-max"><code class="property">gis-y-max</code></h3>
+    <p>The southern (bottom) boundary of the described area, in the default units of the GCS, expressed in decimal degrees where applicable.</p>
+
+    <h3 id="gis-crs"><code class="property">gis-crs</code></h3>
+    <p>The EPSG code for the Coordinate Reference System (CRS) used in the described area, in the format <code>EPSG-<i>number</i></code>.</p>
+
+    <h3 id="issues">Issues</h3>
+    <ul>
+	    <li class="issue"><b>ISSUE:</b>How to deal with x-min etc. for maps that have been rotated (e.g. where north is in a different direction than the y-min/top)??</li>
+	    <li class="issue"><b>ISSUE:</b>How can we leverage CSS transforms?</li>
+    </ul>  
+  </section>
+
+
+  <section id="targets">
+    <h2>Target Formats</h2>
+    
+    <p>Annoshape is not intended to provide a layer of graphics over texts documents, because positions in such documents change with alterations to display size, font size, content, and other factors; it is only intended for use with visual media with relatively fixed dimension ratios, such as images, videos, and maps.</p>
+    
+    <h3 id="source-attributes">Annoshape in source attributes</h3>
+    <p>An Annoshape declaration is not restricted to the URL of the main resource (e.g. the containing page). Any element which references an external reference, such as an HTML <code>img</code> element, may contain an Annoshape declaration in the URL of its source attribute (or CSS property value). If a target resource contains Annoshape declaration in its URL, then that Annoshape declaration must apply to that element, and only to that element; the <code>target-selection</code> property of the Annoshape declaration must not be required, and if present, must be ignored.</p>
+
+    <p>Note that only the single-declaration restriction also applies to Annoshape declarations in the external-resource URL of a target resource. If both the page URL and target-resource URL both contain Annoshape declarations that target the same resource, the page URL takes precedence. (<b>ISSUE:</b> This order of precedence is to allow external resources to annotate an image even if the original page source also contains annotations... this is tricky, and may be a reason to allow multiple declarations to apply at the same time.)</p>
+    
+    <p><i><b>Implementation Note:</b> This is not currently implemented, though it probably wouldn't be hard.</i></p>
+
+  </section>
+
+
+  <section id="data">
+    <h2>Data and Annotations</h2>
+    
+    <p>SVG can contain text, both for display and for metadata. Annoshape does not include text capabilities, by design; it is intended more for indicating specific locations, rather than describing them.</p>
+    <p>One of the goals of Annoshape is to serve as a simple resource to link a specific location (or set of locations) on an image or map to a resource that describes or adds information about that location. For example, an annotation (such as an a document in the Open Annotation format) could use a URL which includes an Annoshape parameter as the annotation's target or selector, to make a comment or tag for a specific section of an image.</p>
+    <p>Each Annoshape declaration is intended to serve as a discrete connection to a specific data resource; obviously, the same Annoshape declaration could be used independently by multiple data resources concurrently. Using a Annoshape directly in a linking resource provides a one-direction association from the resource to the described object. To enable multidirectional or abstracted associations, Annoshape can have an <code>id</code> or a <code>data-*</code> attribute that acts as a key or code for the Annoshape shape, like so:</p>
+    <pre><code><span class="lolite">svg(){circle{<span class="hilite">id:building-4223;</span>cx:368;cy:181;r:18;}}</code></pre>
+    <pre><code><span class="lolite">svg(){polyline{<span class="hilite">data-category:road;</span>points:174.5,261,290.5,411,220.5;}}</code></pre>
+    <p>Other semantic data attributes can be added as well, such as RDFa or microdata, though nesting structures are not supported.</p>
+    <p>It is common in GIS to include non-geographic data associated with the geographic data, such as place-names, categories, population, rainfall, area, permeability of surfaces, and so on. Each piece of data is associated with a particular vector object, called a “feature”, which represents a building, road or road segment, waterway, or other object;  in the parlance of GIS, an “attribute” (not to be confused with HTML or XML element attributes) is the discrete piece of data that applies to a feature. (Note that in GIS, these attributes are not generally considered metadata, but rather is considered as part of the whole dataset; they would consider metadata to be such things as author, creation date, authoring tool, data sources, methodology, and so forth.) Annoshape is similar in function (if not in scope) to a GIS feature, and provides mechanism to associate it with a GIS attribute.</p>
+    <p>Technically, it's possible to include a <code>title</code> attribute to the shape declaration, but this is discouraged for two reasons: separation of functionality; and overall length of the URL. Regarding the separation of functionality, Annoshape is intended as an indicator for a resource, and the body of the description resource should be separate, to keep a many-to-many relationship between Annoshape selectors and the description resources, and to make it easy to change one or the other independently. Regarding the length of the URL, while theoretically URLs can be of unbounded length, per the RFC-2616 specification, the practical limit is 2048 characters for some browsers; even some servers have a limit to how long a URL they will accept. Annoshape should not be used to pass text in the URL, in general.</p>
+  </section>
+
+  <section id="other-tech">
+    <h2>Comparison to Related Technologies</h2>
+    <p>There are other languages and formats with similar features to Annoshape. However, none of them are intended to be compact expressions as a URL parameter, which makes Annoshape well-suited for various web tasks and services, like exchanging annotations and other information on images and maps.</p>
+    <p>Note that Annoshape is not intended to represent a whole map or dataset in SVG, but rather to provide links into a specific view, and highlights within that view.</p>
+  
+    <section id="svg">
+      <h3>SVG</h3>
+      <p>Scalable Vector Graphics (SVG) was developed by W3C as a web graphics format based on XML, and is widely deployed in vector drawing tools and web browsers. Annoshape (Scalable Vector Geodata) is an attempt to merge the best features of both WKT and SVG, and to add the ability to express the shapes as a URL parameter.</p>
+      <p>Annoshape is a simplified profile of SVG, using a different serialization as its representation.</p>
+      <p>Annoshape is not intended to include text, grouping or nesting, or more complex SVG graphics features.</p>
+    </section>
+
+    <section id="wkt">
+      <h3>WKT</h3>
+      <p><a href="https://en.wikipedia.org/wiki/Well-known_text">Well-known text (WKT)</a> was defined by the Open Geospatial Consortium (OGC) in their <i>Simple Feature Access</i> and <i>Coordinate Transformation Service</i> specifications, and standardized is in the ISO/IEC 13249-3:2011 standard, <i>"Information technology -- Database languages -- SQL multimedia and application packages -- Part 3: Spatial"</i> (SQL/MM). WKT is commonly used in many geographical and database products.</p>
+      <p>Annoshape has several advantages over WKT:</p>
+      <ul>
+        <li>It's natively understood by the browser, so it can be rendered easily</li>
+        <li>It can be styled with CSS</li>
+        <li>It can contain its own viewbox for scaling</li>
+        <li>Its feature set is a superset of WKT's 2D feature set; anything expressible in 2D WKT can be expressed in Annoshape</li>
+        <li>It has a much richer selection of shapes and shape segments, including Bézier curves, so it's finer-grained and more expressive</li>
+        <li>Simple shapes are roughly as verbose as WKT, and typically have fewer bytes</li>
+        <li>It has a top-down coordinate system, like web design conventions, making it easier for web developers; this is counter to mapping conventions, but the conversion is easy</li>
+        <li>It's applicable to images and videos as well as maps</li>
+        <li>Depending on how this would ultimately be implemented, the resulting shapes can be DOM elements that can be manipulated via script, are hit-testable, and so on</li>
+      </ul>
+      <p>WKT still has a few advantages over this early Annoshape experiment:</p>
+      <ul>
+        <li>It's widely deployed and understood; Annoshape is still just an experiment</li>
+        <li>It has 3D capabilities; these may or may not be expressible in SVG with the CSS z-index applied</li>
+        <li>It has a well-defined relationship with multiple coordinate system projections; Annoshape has not yet defined how its coordinate system works with different projections, though it's likely that there will be applicable transforms that enable this.</li>
+      </ul>
+    </section>
+
+
+  <section id="gml">
+    <h3>GML</h3>
+    <p><a href="https://en.wikipedia.org/wiki/Geography_Markup_Language">Geography Markup Language (GML)</a> is an XML language for geographic modeling and interchange. It has many features beyond the vector representations of geometries, including raster images, topology, and a full CRS. A significant aspect of GML is its abstract notion of “features”, which may have one or many geometric representations, or no geometric representation at all. GML is common and widely accepted.</p>
+    <p>There are several difference in scope between Annoshape and GML:</p>
+    <ul>
+      <li>GML is intended to fully represent a geography; Annoshape is focused on simply highlighting parts of an image or geometry (and to relate that to a geography)</li>
+      <li>Annoshape is 2D only, while GML is a 3D language that can express altitude; Annoshape may be able to express simple planar altitudes with the CSS z-index property</li>
+      <li>SVG is natively understood by the browser, so it can be rendered easily</li>
+      <li>Annoshape can be styled with CSS</li>
+      <li>Annoshape is more compact and simpler than GML</li>
+      <li>Annoshape is expressible as a URL</li>
+      <li>GML contains its own metadata and annotations, while Annoshape is only an anchor for external resources to express metadata and annotations</li>
+      <li>GML only describes straight lines, while Annoshape describes curves as well</li>
+      <li>There is a straightforward two-way conversion between SVG/Annoshape and GML's 2D (and potentially simple 3D) geometry</li>
+    </ul>
+    <p>In general, though SVG and GML are both XML graphics formats, Annoshape's goals and format are much more similar to WKT.</p> 
+  </section>
+
+  
+    <section id="kml">
+      <h3>KML</h3>
+      <p><a href="https://en.wikipedia.org/wiki/Keyhole_Markup_Language">Keyhole Markup Language (KML)</a> is an XML language for describing 2D and 3D shapes in geographic space, which allows annotations to be embedded in text or HTML. It was developed by Keyhole Inc, and acquired by Google, and subsequently standardized by the Open Geospatial Consortium in 2008. It's supported by Google Maps, Google Earth, and some other web mapping software.</p>
+      <p>As with GML, there are several difference in scope between Annoshape and KML:</p>
+      <ul>
+        <li>KML inherently describes its data in geographic space, using decimal degrees in the WGS84 coordinate system and datum, while Annoshape only defines its own abstract geometric coordinate space and provides a reference to any given projection for transformation</li>
+        <li>Annoshape is 2D only, while KML is a 3D language that can express altitude; Annoshape may be able to express simple planar altitudes with the CSS z-index property</li>
+        <li>SVG is natively understood by the browser, so it can be rendered easily</li>
+        <li>Annoshape can be styled with CSS</li>
+        <li>Annoshape is more compact and simpler than KML</li>
+        <li>Annoshape is expressible as a URL</li>
+        <li>KML contains its own metadata and annotations, while Annoshape is only an anchor for external resources to express metadata and annotations</li>
+        <li>KML only describes straight lines, while Annoshape describes curves as well</li>
+        <li>There is a straightforward two-way conversion between SVG/Annoshape and KML's 2D (and potentially simple 3D) geometry</li>
+      </ul>
+      <p>In general, though SVG and KML are both XML graphics formats, Annoshape's goals and format are much more similar to WKT.</p> 
+    </section>
+
+    <section id="geojson">
+      <h3>GeoJSON and GeoJSON-LD</h3>
+      <p><a href="http://geojson.org/geojson-spec.html">GeoJSON</a> is a geospatial data interchange format, based on JavaScript Object Notation (JSON). GeoJSON represents geospatial features, their characteristics, and their related geometry; the geometry features are similar to those of WKT, with points, multipoints, lines, multilines, polygons, and multipolygons. GeoJSON-LD is a way to extend GeoJSON to add defined terms from other vocabularies. GeoJSON is a defacto standard developed by an informal group, and is widely used.</p> 
+      <p>As with other technologies, the scope and focus of GeoJSON is different than that of Annoshape.</p>
+      </ul>
+    </section>
+
+    <section id="geo-uri">
+      <h3>'geo' URI (RFC-5870)</h3>
+      <p>A geo URI is a simple URI scheme to define a single point in a defined CRS (the default is WGS-84); it has parameters for a set of coordinates (i.e. latitude, longitude, and optionally altitude), a precision uncertainty factor in meters, and a CRS (if not WGS-84). It was defined by IETF in the <a href="http://tools.ietf.org/rfc/rfc5870">A Uniform Resource Identifier for Geographic Locations ('geo' URI)</a> RFC (RFC-5870) in 2010.</p> 
+      <p>As with other technologies, there are several difference in scope between Annoshape and geo URIs:</p>
+      <ul>
+        <li>Geo URI does not describe how it could be used as a query or fragment parameter to a service-based URL (e.g., how you could use it for a mapping service like Google, Bing, or Yahoo)</li>
+        <li>Geo URI does not describe shapes or lines, only a single point</li>
+        <li>Geo URI does not define a rendered appearance</li>
+        <li>Geo URI is exclusively for maps and other geographic use cases, not images or videos</li>
+      </ul>
+    </section>
+  
+    <section id="datauri">
+      <h3>Data URIs</h3>
+      <p>A data URI is a URI (Uniform Resource Identifier) scheme which describes a method of including arbitrary data (such as an SVG or a raster image) inline into a web resource (such as an HTML or CSS file), as if the data were an external resource. The body of a data URI may be encoded as a base64 binary representation to compress it, or left as plain-text markup. The data URI specification was defined in RFC-2397 by the Internet Engineering Task Force (IETF) in 1998. Annoshape has different capabilities and functions compared to a data URI:</p> 
+      <ul>
+        <li>A data URI is simply the file itself, with no context information about how the graphics are to be applied, or to what image or map location; a different scheme could be designed to provide this additional information which encapsulates a data URI as its payload, but this is not a native capability of data URIs; Annoshape is explicitly designed for this purpose</li>
+        <li>A data URI can include raster images, HTML, or other content along with an SVG, all in the same strin</li>
+        <li>Often the data URI is base64 encoded markup, while Annoshape is plain text; this makes an Annoshape declaration shorter (perhaps half the filesize), and also easier to review and compose</li>
+        <li>If the data URI is not encoded (and thus not compressed), the Annoshape declaration is even shorter still</li>
+        <li>A data URI can contain arbitrary code, including executable JavaScript, while an Annoshape declaration is a constrained syntax that does not allow JavaScript, and is thus more secure</li>
+      </ul>
+    </section>
+
+    <section id="media-fragments">
+      <h3>Media Fragments</h3>
+      <p>Media Fragments is a URI scheme to link to a specific time range, viewport, and tracks within timed media. It was defined by W3C in the <a href="http://www.w3.org/TR/media-frags/">Media Fragments URI 1.0</a> specification in 2012.</p> 
+      <ul>
+        <li>Media Fragments includes a time-range selector, and a track selector; SVG only defines shapes, though it may be extended to include a similar time-range selector, or may be used with Media Fragments' time-range selector</li>
+        <li>Media Fragments only defines a rectangular region for the spacial selector; Annoshape allows the full range of shapes available in SVG</li>
+        <li>Media Fragments does not include the ability to style the selection; Annoshape allows arbitrary CSS styling on its shapes</li>
+        <li>Media Fragments is ambiguous regarding whether the shape selector behavior should be highlighting or clipping ("cropping"); Annoshape clearly defines the highlighting case, and may define clipping explicitly via another mechanism</li>
+        <li>Media Fragments does not provide a mechanism to address multiple media resources in a single page</li>
+        <li>Media Fragments does not consider mapping as a use case</li>
+      </ul>
+    </section>
+  </section>
+  
+  
+  <section id="todo">
+    <h2>TODO:</h2>
+    <ul>
+      <li><s>Create strawman proposal for resolving coordinates and projections</s></li>
+      <li>Illustrate coordinate transformations between SVG and a projection (maybe showing multiple projections)</li>
+      <li><s>Add drawing utility to make it easier to add shapes</s></li>
+      <li>Add WKT-to-Annoshape convertor utility</li>
+      <li>Add SVG-to-Annoshape convertor utility</li>
+      <li><s>Add default markers (arrow, dot, and map-pin)</s></li>
+      <li>Allow links?</li>
+      <li>Allow use elements?</li>
+      <li>Add time controls, similar to Media Fragments, but allowing multiple ranges (e.g. play 10s–20, then skip ahead to 45s–59s)</li>
+      <li>Add cropping via CSS, not just highlighting?</li>
+      <li>Add data-* attributes to show how to link data</li>
+      <li>Demo other selectors than id</li>
+      <li></li>
+    </ul>
+  </section>
+
+  <section id="tools">
+    <h2>Tools:</h2>
+    <ul>
+      <li><a href="https://github.com/davidmcclure/svg-to-wkt">David McClure's SVG-to-WKT.js convertor utility</a></li>
+    </ul>
+  </section>
+
+  <section id="ack">
+    <h2>Acknowledgments</h2>
+    <p>Thanks to <a href="http://www.meganculler.com/">Megan Culler</a>, a GIS analyst consultant at the EPA (and my wife), for patiently educating me about Coordinate Reference Systems, Geographic Coordinate Systems, and projections, for showing me mapping tool workflows, and for creating (and recreating) the maps I used in this document and demo. Of course, any mistakes are mine.</p>
+    
+    <p>Thanks also to <a href="http://frozenice.de">David Kirstein</a> for helping me with the parsing regex; and to <a href="http://www.met.reading.ac.uk/users/users/1935">Raquel Alegre</a>, University of Reading, UK, and <a href="http://wwwold.mpiwg-berlin.mpg.de/en/staff/members/casties">Robert Casties</a>, Max Planck Institute, Germany, for telling me about WKT and inspiring me to create Annoshape. And thanks to the Open Annotation community (and <a href="http://www.w3.org/community/openannotation/">Community Group</a>) for highlighting the need for a linking scheme for annotating images.</a>
+  </section>
+  
+  <script src="annoshape.js" defer></script>
+
+</body>
+</html>
